@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Predictions History</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+      .container {
+        margin-top: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center">All Predictions History</h1>
+      <table class="table table-bordered table-striped">
+        <thead class="thead-light">
+          <tr>
+            <th>Duration</th>
+            <th>Protocol Type</th>
+            <th>Service</th>
+            <th>Flag</th>
+            <th>Src Bytes</th>
+            <th>Dst Bytes</th>
+            <th>Land</th>
+            <th>Count</th>
+            <th>Srv Count</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for prediction in predictions %}
+          <tr>
+            <td>{{ prediction.duration }}</td>
+            <td>{{ prediction.protocol_type }}</td>
+            <td>{{ prediction.service }}</td>
+            <td>{{ prediction.flag }}</td>
+            <td>{{ prediction.src_bytes }}</td>
+            <td>{{ prediction.dst_bytes }}</td>
+            <td>{{ prediction.land }}</td>
+            <td>{{ prediction.count }}</td>
+            <td>{{ prediction.srv_count }}</td>
+            <td>{{ prediction.result }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="text-center">
+        <a href="{{ url_for('index') }}" class="btn btn-primary"
+          >Back to Recent Predictions</a
+        >
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
