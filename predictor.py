@@ -5,9 +5,10 @@ from collections import defaultdict
 import joblib
 
 # Load the trained model
-model = joblib.load('trained_model.pkl')
+model = joblib.load('trained_model_synthetic_data.pkl')
 
 # Function to map ports to services
+# Expanded service mapping
 def get_service(port):
     service_mapping = {
         80: "http",
@@ -20,10 +21,23 @@ def get_service(port):
         110: "pop3",
         143: "imap",
         3389: "rdp",
-        23: "telnet"
+        23: "telnet",
+        3306: "mysql",
+        6379: "redis",
+        8080: "http-alt",
+        5900: "vnc",
+        1812: "radius",
+        514: "syslog",
+        69: "tftp",
+        5000: "upnp",
+        5432: "postgresql",
+        8888: "http-proxy",
+        22: "scp",
+        6000: "X11"
         # Add more services and ports as needed
     }
     return service_mapping.get(port, "other")
+
 
 # Define a dictionary to hold flow data
 flows = defaultdict(lambda: {
@@ -50,10 +64,13 @@ df = pd.DataFrame(columns=columns)
 protocol_mapping = {6: "tcp", 17: "udp", 1: "icmp"}
 
 # Function to extract features from a packet
+# Function to extract features from a packet
 def extract_features(packet):
     if IP in packet:
         src_ip = packet[IP].src
         dst_ip = packet[IP].dst
+        packet_size = len(packet)  # Size of the packet
+        ttl = packet[IP].ttl  # Time-to-live value
 
         # Use (src_ip, dst_ip, src_port, dst_port) as flow identifier
         if TCP in packet:
@@ -91,6 +108,10 @@ def extract_features(packet):
         flows[flow_key]["land"] = 1 if packet[IP].src == src_ip else 0
         flows[flow_key]["srv_count"] += 1 if flows[flow_key]["service"] else 0
         
+        # New parameters
+        flows[flow_key]["packet_size"] = flows[flow_key].get("packet_size", 0) + packet_size
+        flows[flow_key]["ttl"] = ttl  # Capture the TTL value
+        
         # Duration of the flow
         duration = time.time() - flows[flow_key]["start_time"]
 
@@ -104,7 +125,9 @@ def extract_features(packet):
             "dst_bytes": flows[flow_key]["dst_bytes"],
             "land": flows[flow_key]["land"],
             "count": flows[flow_key]["count"],
-            "srv_count": flows[flow_key]["srv_count"]
+            "srv_count": flows[flow_key]["srv_count"],
+            "packet_size": flows[flow_key]["packet_size"],
+            "ttl": flows[flow_key]["ttl"]
         }
 
         # Append row to the DataFrame
